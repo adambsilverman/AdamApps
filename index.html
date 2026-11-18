@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdamApps · Adam Silverman</title>
+<meta name="description" content="Web apps by Adam Silverman: SilverApps for music training, MarkaApps, and more.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#22202a;--muted:#5d5866;--paper:#fbf6ee;--line:#e7dfd2;--red:#c9432d;--navy:#2b3a67;--pink:#c2457f}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font:17px/1.55 Literata,Georgia,serif}
+  .wrap{max-width:920px;margin:0 auto;padding:64px 22px 48px}
+  header{margin-bottom:40px}
+  .kicker{font:600 13px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+  h1{font:400 clamp(56px,11vw,96px)/.95 "League Gothic",Impact,sans-serif;letter-spacing:.01em;margin:10px 0 14px;text-transform:uppercase}
+  .lede{max-width:560px;color:var(--muted);margin:0}
+  h2{font:400 30px/1 "League Gothic",Impact,sans-serif;text-transform:uppercase;letter-spacing:.03em;margin:44px 0 16px;color:var(--navy)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .card{display:flex;flex-direction:column;gap:8px;padding:26px 26px 22px;background:#fff;border:1px solid var(--line);border-radius:18px;
+    text-decoration:none;color:inherit;box-shadow:0 2px 0 var(--line);transition:transform .18s ease,box-shadow .18s ease}
+  .card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 12px 28px #2b3a6722}
+  .card:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+  .badge{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:28px;margin-bottom:6px}
+  .card h3{font:400 34px/1 "League Gothic",Impact,sans-serif;text-transform:uppercase;margin:0;letter-spacing:.02em}
+  .card p{margin:0;color:var(--muted);font-size:15.5px}
+  .go{margin-top:auto;padding-top:12px;font:600 13px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+  .silver .badge{background:#fde4dc}.silver .go{color:var(--red)}
+  .marka .badge{background:#f8e1ee}.marka .go{color:var(--pink)}
+  .soon{border:1.5px dashed var(--line);border-radius:18px;padding:22px 26px;color:var(--muted);font-size:15.5px}
+  footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font:14px system-ui,sans-serif;color:var(--muted)}
+  footer a{color:var(--navy)}
+  @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="kicker">Adam Silverman</div>
+      <h1>AdamApps</h1>
+      <p class="lede">Everything I build for the web, in one place.</p>
+    </header>
+
+    <h2>Collections</h2>
+    <main class="grid">
+      <a class="card silver" href="https://adambsilverman.github.io/SilverApps/">
+        <span class="badge" aria-hidden="true">🎼</span>
+        <h3>SilverApps</h3>
+        <p>Interactive music training: theory, ear training and performance, for solo practice or live with a whole class.</p>
+        <span class="go">Open SilverApps →</span>
+      </a>
+      <a class="card marka" href="https://adambsilverman.github.io/MarkaApps/">
+        <span class="badge" aria-hidden="true">🌸</span>
+        <h3>MarkaApps</h3>
+        <p>Marka's study hub: flashcards, drills and games for 9th-grade classes.</p>
+        <span class="go">Open MarkaApps →</span>
+      </a>
+    </main>
+
+    <h2>My apps</h2>
+    <!-- Add a card here for each app saved in this folder, e.g.
+    <div class="grid"><a class="card" href="my-app.html"><span class="badge">🧰</span><h3>My App</h3><p>What it does.</p><span class="go">Open →</span></a></div> -->
+    <div class="soon">Nothing here yet.</div>
+
+    <footer>Made by <a href="https://adambsilverman.com">Adam Silverman</a></footer>
+  </div>
+</body>
+</html>

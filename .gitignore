@@ -1,0 +1,6 @@
+# The two app collections are their own GitHub repositories
+SilverApps/
+MarkaApps/
+# Local-only files, never published
+_archive/
+.DS_Store

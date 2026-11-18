@@ -1,0 +1,23 @@
+# AdamApps
+
+Home folder for all of Adam Silverman's web apps. Lives at `~/Documents/AdamApps` (no longer in OneDrive).
+Three separate GitHub repositories, each published with GitHub Pages:
+
+| Folder | Repository | Site |
+|---|---|---|
+| `AdamApps/` (this folder) | github.com/adambsilverman/AdamApps | https://adambsilverman.github.io/AdamApps/ |
+| `AdamApps/SilverApps/` | github.com/adambsilverman/SilverApps | https://adambsilverman.github.io/SilverApps/ |
+| `AdamApps/MarkaApps/` | github.com/adambsilverman/MarkaApps | https://adambsilverman.github.io/MarkaApps/ |
+
+`SilverApps/` and `MarkaApps/` are their own git repos, ignored by this one (`.gitignore`).
+Each has its own instructions: `SilverApps/HANDOFF.md`, `MarkaApps/CLAUDE.md`.
+
+## Rules
+- `index.html` here is the hub page linking to the other sites. Adam's own apps go in this
+  folder as `*.html` files; add a card for each to the "My apps" section of `index.html`.
+- **Syncing is automatic.** `sync.sh` runs every 2 minutes in the background (installed by
+  `install-sync.command`): it commits, pulls and pushes all three repos once files stop changing
+  for a minute, and rebuilds the MarkaApps index when an app there changes. No need to push by hand.
+  Log: `~/Library/Logs/AdamApps-sync.log`.
+- `_archive/` holds old material moved out of OneDrive. It is never committed.
+- Never put passwords or recovery codes anywhere in this folder: everything outside `_archive/` is public.
