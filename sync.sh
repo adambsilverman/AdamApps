@@ -1,67 +1,55 @@
 #!/bin/bash
-# sync.sh — keep AdamApps, SilverApps and MarkaApps in step with GitHub.
+# sync.sh — commit and push whatever changed in AdamApps, SilverApps and MarkaApps.
 #
-# Runs every 2 minutes in the background (see install-sync.command). For each repo it:
-#   1. skips the repo if something is mid-edit (a file changed in the last minute),
-#      a SilverApps build is running, or git is busy;
-#   2. MarkaApps only: rebuilds index.html with handoff.sh when an app changed;
-#   3. commits every change, pulls anything new from GitHub, and pushes.
-# Run it by hand any time:  ./sync.sh        Log: ~/Library/Logs/AdamApps-sync.log
+# Not a background job: Claude runs this once when it has finished editing files
+# (automatically in Claude Code via the Stop hook in .claude/settings.json; in other
+# sessions because CLAUDE.md tells it to). You can also run it yourself:  ./sync.sh
+# Repos with no changes are skipped without touching the network.
+#
+# Pushing uses your Mac's saved GitHub login. Where that isn't available (Claude working
+# through the desktop app's Linux shell), it uses a token saved in .git/github-token
+# inside this folder — that file is never uploaded.
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-HOST="$(scutil --get ComputerName 2>/dev/null || hostname -s)"
-
-log()    { echo "$(date '+%Y-%m-%d %H:%M:%S')  $*"; }
-notify() { osascript -e "display notification \"$1\" with title \"AdamApps sync\"" >/dev/null 2>&1; }
+TOKEN_FILE="$ROOT/.git/github-token"
+if [ -s "$TOKEN_FILE" ]; then
+  export GIT_CONFIG_COUNT=2
+  export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=""
+  export GIT_CONFIG_KEY_1=credential.helper
+  export GIT_CONFIG_VALUE_1="!f() { echo username=x-access-token; echo password=\$(cat '$TOKEN_FILE'); }; f"
+fi
+HOST="$( (scutil --get ComputerName || hostname -s || hostname) 2>/dev/null | head -1)"
 
 sync_repo() {
   local repo="$1" name; name="$(basename "$repo")"
-  cd "$repo" 2>/dev/null || { log "$name: folder missing"; return; }
-  [ -d .git ] || { log "$name: not a git repo"; return; }
-  [ -e .git/index.lock ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ] && { log "$name: git busy, skipping"; return; }
-  [ -e build/.build.lock ] && { log "$name: build running, skipping"; return; }
-
-  # Wait until edits settle: anything (outside .git) modified in the last minute?
-  if [ -n "$(find . -path ./.git -prune -o -type f -mmin -1 -print 2>/dev/null | grep -v '/\.DS_Store$' | head -1)" ]; then
-    log "$name: files still changing, will try next round"; return
-  fi
+  cd "$repo" 2>/dev/null && [ -d .git ] || return 0
+  if [ -e build/.build.lock ]; then echo "$name: a build is running — run sync.sh again when it finishes"; return 0; fi
 
   if [ -n "$(git status --porcelain)" ]; then
     # MarkaApps: rebuild the index whenever an app (not just index.html) changed
-    if [ -x ./handoff.sh ] && git status --porcelain | grep -v ' index\.html$' | grep -q '\.html'; then
-      ./handoff.sh --no-push >/dev/null 2>&1 || log "$name: handoff.sh failed"
+    if [ -f ./handoff.sh ] && git status --porcelain | grep -v ' index\.html$' | grep -q '\.html'; then
+      bash ./handoff.sh --no-push >/dev/null || echo "$name: handoff.sh failed"
     fi
     git add -A
-    local files; files="$(git diff --cached --name-only | sed 's#.*/##' | head -5 | paste -sd ',' - | sed 's/,/, /g')"
-    local n; n="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+    local n files
+    n="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+    files="$(git diff --cached --name-only | sed 's#.*/##' | head -5 | paste -sd ',' - | sed 's/,/, /g')"
     [ "$n" -gt 5 ] && files="$files and $((n-5)) more"
-    git commit -q -m "Auto-sync from $HOST: $files" && log "$name: committed $n file(s)"
+    git commit -q -m "Update from $HOST: $files" && echo "$name: committed $n file(s)"
   fi
 
-  # First push of a brand-new repo: set up tracking with GitHub
-  if ! git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
-    if git push -q -u origin HEAD 2>/tmp/adamapps-push.err; then log "$name: first push to GitHub"
-    else log "$name: FIRST PUSH FAILED — $(tr '\n' ' ' </tmp/adamapps-push.err)"; fi
-    return
+  if ! git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then   # brand-new repo, first push
+    git push -q -u origin HEAD && echo "$name: first push to GitHub" || echo "$name: PUSH FAILED"
+    return 0
   fi
+  [ -z "$(git log '@{u}..' --oneline 2>/dev/null)" ] && return 0  # nothing to send
 
-  # Bring in changes made on GitHub or on another computer
-  if ! git pull -q --rebase --autostash 2>/tmp/adamapps-pull.err; then
+  if ! git pull -q --rebase --autostash; then
     git rebase --abort >/dev/null 2>&1
-    log "$name: PULL CONFLICT — $(tr '\n' ' ' </tmp/adamapps-pull.err)"
-    notify "$name has a conflict with GitHub. Open Terminal in that folder and run: git status"
-    return
+    echo "$name: CONFLICT with GitHub — not pushed. Resolve in $repo (git status)."
+    return 1
   fi
-
-  if [ -n "$(git log '@{u}..' --oneline 2>/dev/null)" ]; then
-    if git push -q 2>/tmp/adamapps-push.err; then
-      log "$name: pushed to GitHub"
-    else
-      log "$name: PUSH FAILED — $(tr '\n' ' ' </tmp/adamapps-push.err)"
-      notify "Couldn't push $name to GitHub. See ~/Library/Logs/AdamApps-sync.log"
-    fi
-  fi
+  git push -q && echo "$name: pushed to GitHub" || echo "$name: PUSH FAILED"
 }
 
 for r in "$ROOT" "$ROOT/SilverApps" "$ROOT/MarkaApps"; do sync_repo "$r"; done

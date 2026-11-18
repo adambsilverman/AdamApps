@@ -15,9 +15,12 @@ Each has its own instructions: `SilverApps/HANDOFF.md`, `MarkaApps/CLAUDE.md`.
 ## Rules
 - `index.html` here is the hub page linking to the other sites. Adam's own apps go in this
   folder as `*.html` files; add a card for each to the "My apps" section of `index.html`.
-- **Syncing is automatic.** `sync.sh` runs every 2 minutes in the background (installed by
-  `install-sync.command`): it commits, pulls and pushes all three repos once files stop changing
-  for a minute, and rebuilds the MarkaApps index when an app there changes. No need to push by hand.
-  Log: `~/Library/Logs/AdamApps-sync.log`.
+- **When you have finished editing files in any of the three repos, run `sync.sh` (in this
+  folder) once, before your final reply.** It commits and pushes every repo that changed (and
+  rebuilds the MarkaApps index when an app there changed); unchanged repos are skipped. There is
+  no background sync. In Claude Code the Stop hook in `.claude/settings.json` runs it for you.
+  Working through the desktop app's Linux shell: `bash $HOME/mnt/AdamApps/sync.sh`. If it says
+  PUSH FAILED there, `.git/github-token` is missing or expired: tell Adam, don't work around it.
+  Report what it pushed (or any CONFLICT) in your reply.
 - `_archive/` holds old material moved out of OneDrive. It is never committed.
 - Never put passwords or recovery codes anywhere in this folder: everything outside `_archive/` is public.
