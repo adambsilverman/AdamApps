@@ -4,3 +4,4 @@ MarkaApps/
 # Local-only files, never published
 _archive/
 .DS_Store
+.claude/

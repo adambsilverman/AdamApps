@@ -19,8 +19,9 @@ Each has its own instructions: `SilverApps/HANDOFF.md`, `MarkaApps/CLAUDE.md`.
   folder) once, before your final reply.** It commits and pushes every repo that changed (and
   rebuilds the MarkaApps index when an app there changed); unchanged repos are skipped. There is
   no background sync. In Claude Code the Stop hook in `.claude/settings.json` runs it for you.
-  Working through the desktop app's Linux shell: `bash $HOME/mnt/AdamApps/sync.sh`. If it says
-  PUSH FAILED there, `.git/github-token` is missing or expired: tell Adam, don't work around it.
-  Report what it pushed (or any CONFLICT) in your reply.
+  Working through the desktop app's Linux shell (`bash $HOME/mnt/AdamApps/sync.sh`), pushing to
+  GitHub is blocked, so the script commits and sets `.git/push-requested`; Adam's Mac then pushes
+  (launchd watch installed by `setup-mac.command`). Don't try to push any other way.
+  Report what it committed/pushed (or any CONFLICT) in your reply.
 - `_archive/` holds old material moved out of OneDrive. It is never committed.
 - Never put passwords or recovery codes anywhere in this folder: everything outside `_archive/` is public.
